@@ -1,0 +1,98 @@
+<span style="font-family: verdana, geneva, sans-serif;"><!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <title>Compete Finder | by Simran Tanwani</title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style3.css') }}">
+    
+      <!-- Font Awesome Cdn Link -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+      <script defer src="https://pyscript.net/alpha/pyscript.js"></script> 
+    </head>
+    <body>
+      <div class="container">
+        <nav style="margin-left: -10%;margin-top: -5%;">
+          <div class="navbar" style="height: 100vh;">
+            <div class="logo">
+              <img src="{{ url_for('static', filename='images/log.jpg') }}" alt="Logo">
+    
+              <p>Compete Finder</p>
+            </div>
+            <ul>
+              <li>
+                <a href="/">
+                  <i class="fas fa-home"></i>
+                  <span class="nav-item">Home</span>
+                </a>
+              </li>
+              <li><a href="Companies.html">
+                <i class="fas fa-chart-bar"></i>
+                <span class="nav-item">Companies</span>
+              </a>
+              </li>
+              <li><a href="Compete.html">
+                <i class="fas fa-tasks"></i>
+                <span class="nav-item">Find Competitors</span>
+              </a>
+              </li>
+              
+            </ul>
+          </div>
+        </nav>
+    
+        <section class="main" style="margin: -3.5% 0 0 0;width:100%">
+          <div class="main-top" width="100%">
+            <p>Explore the universe!</p>
+          </div>
+          <div class="main-body" style="overflow-x: scroll;max-width:90%;margin-left:6%">
+            <h1>Recent Startups</h1>
+          
+            <div class="search_bar" >
+              <form action="Compete.html" method="POST">
+                  <input type="text" placeholder="Enter industry" name="industry">
+                  <input type="text" placeholder="Enter country" name="country">
+                  <input type="submit" value="Search">
+              </form>
+          </div>
+      
+          <!-- Display filtered data -->
+          {% if filtered_data %}
+          <h2>Filtered Data:</h2>
+          <table style="margin-left: 1%;" class="tabled-striped">
+              <thead>
+                  <tr>
+                      <th>Company</th>
+                      <th>Valuation (US$ billions)</th>
+                      <th>Valuation Date</th>
+                      <th>Industry</th>
+                      <th>Country</th>
+                      <th>Founders</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for company in filtered_data %}
+                  <tr>
+                      <td>{{ company['Company'] }}</td>
+                      <td>{{ company['Valuation(US$ billions)'] }}</td>
+                      <td>{{ company['Valuation date'] }}</td>
+                      <td>{{ company['Industry'] }}</td>
+                      <td>{{ company['Country'] }}</td>
+                      <td>{{ company['Founders'] }}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+          {% endif %}
+    
+          
+          
+          
+    
+          
+    
+        
+        </section>
+      </div>
+    
+    </body>
+    </html></span>

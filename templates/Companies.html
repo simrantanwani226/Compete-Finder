@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Compete Finder | by Simran Tanwani</title>
+  <style>
+    *{margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
+.main{
+}
+  </style>
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style3.css') }}">
+
+  <!-- Font Awesome Cdn Link -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <script defer src="https://pyscript.net/alpha/pyscript.js"></script> 
+</head>
+<body>
+  <div class="container">
+    <nav style="margin-left: -10%;margin-top: -5%;">
+      <div class="navbar" >
+        <div class="logo">
+          <img src="{{ url_for('static', filename='images/log.jpg') }}" alt="Logo">
+
+          <p>Compete Finder</p>
+        </div>
+        <ul>
+          <li>
+            <a href="/">
+              <i class="fas fa-home"></i>
+              <span class="nav-item">Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="fas fa-chart-bar"></i>
+              <span class="nav-item">Companies</span>
+            </a>
+          </li>
+          <li>
+            <a href="Compete.html">
+              <i class="fas fa-tasks"></i>
+              <span class="nav-item">Find Competitors</span>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+
+    <section class="main" style="margin: -3.5% 0 0 0;width:100%">
+      <div class="main-top" width="100%">
+        <p>Explore the universe!</p>
+      </div>
+      <div class="main-body"  style="overflow-x: scroll;max-width:90%;">
+        <h1>Recent Startups</h1>
+        <table style="margin-left: 8%;"   >
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Valuation (US$ billions)</th>
+              <th>Valuation Date</th>
+              <th>Industry</th>
+              <th>Country</th>
+              <th>Founders</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for company in companies %}
+            <tr>
+              <td>{{ company['Company'] }}</td>
+              <td>{{ company['Valuation(US$ billions)'] }}</td>
+              <td>{{ company['Valuation date'] }}</td>
+              <td>{{ company['Industry'] }}</td>
+              <td>{{ company['Country'] }}</td>
+              <td>{{ company['Founders'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
