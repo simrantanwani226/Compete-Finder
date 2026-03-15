@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package compete.v1;
+
+option go_package = "github.com/simrantanwani226/compete-finder/gen/compete/v1;competev1";
+
+service CompeteService {
+  rpc FindCompetitors(FindCompetitorsRequest) returns (FindCompetitorsResponse);
+  rpc GetMarketHeatmap(GetMarketHeatmapRequest) returns (GetMarketHeatmapResponse);
+}
+
+message FindCompetitorsRequest {
+  string name = 1;
+  string description = 2;
+  string sector = 3;
+  int32 limit = 4;
+}
+
+message FindCompetitorsResponse {
+  repeated Competitor competitors = 1;
+  int32 total_in_sector = 2;
+}
+
+message Competitor {
+  string name = 1;
+  string description = 2;
+  repeated string industries = 3;
+  string batch = 4;
+  int32 team_size = 5;
+  string status = 6;
+  string url = 7;
+  double match_score = 8;
+}
+
+message GetMarketHeatmapRequest {
+  string sector = 1;
+}
+
+message GetMarketHeatmapResponse {
+  repeated BatchTrend batches = 1;
+  string market_status = 2;
+  double growth_factor = 3;
+}
+
+message BatchTrend {
+  string batch = 1;
+  int32 startup_count = 2;
+  string trend = 3;
+}
