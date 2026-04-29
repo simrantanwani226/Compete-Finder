@@ -1,36 +1,77 @@
-# Compete Finder: Automatic Competition Finder
-Compete Finder is a web application designed to help users find upcoming competitions and events based on their interests and preferences.
+# Compete Finder
 
-## Overview
-Compete Finder utilizes web scraping techniques to gather information about competitions from various websites. Users can search for competitions by category, location, date, and other filters to find relevant events.
+A Go service that finds competitor startups for a given product description by scoring real Y Combinator companies with TF-IDF, served over Connect RPC.
 
-## Features
-Web Scraping: Automatically collects competition data from specified websites.
-Search and Filtering: Allows users to search for competitions based on category, location, date, etc.
-User Registration and Preferences: Provides user registration and profile management features to personalize competition recommendations.
-Email Notifications: Sends notifications to users about upcoming competitions based on their preferences.
-Technologies Used
-Frontend: (Specify if any frontend technologies used)
-Backend: Python (Flask/Django)
-Database: (Specify your database if applicable)
-Web Scraping: BeautifulSoup, Scrapy (mention your web scraping libraries)
-## Installation
-To run Compete Finder locally, follow these steps:
+Given a name, description, and sector, it returns the top-N most similar YC startups (with match scores) and a market heatmap showing how that sector has grown across YC batches.
 
-Clone the repository: git clone <repository-url>
-Navigate to the project directory: cd Compete-Finder
-Install dependencies: pip install -r requirements.txt
-(Add any specific instructions for setting up the database or environment)
-Run the application: (Specify how to start the server or run the application)
-## Usage
-Access the application at http://localhost:<port> in your web browser.
-Users can register, set preferences, and search for competitions.
-Administrators can manage competition data and user accounts.
-## Contributing
-Contributions are welcome! If you have suggestions or feature requests, please open an issue or submit a pull request.
+## Architecture
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+```
+internal/provider/         Startup struct, Provider interface
+internal/provider/yc/      YC API adapter (yc-oss.github.io)
+internal/matcher/          Tokenizer + TF-IDF scoring
+internal/heatmap/          Sector filtering + batch trend builder
+proto/compete/v1/          Protobuf definitions
+gen/compete/v1/            Generated Connect RPC code
+internal/handler/          Connect service handlers
+cmd/server/                Server entry point
+```
 
-## Acknowledgments
-Inspired by the need to simplify the process of finding and participating in competitions and events.
+## Requirements
+
+- Go 1.22+
+
+## Running the server
+
+```bash
+go run ./cmd/server
+# listening on :8080
+```
+
+The server fetches the YC company list on demand from `https://yc-oss.github.io/api/companies/all.json`, so it needs network access on the first request.
+
+## Calling the RPCs
+
+Connect supports HTTP/JSON, so you can call the service with plain `curl`.
+
+### FindCompetitors
+
+Returns the top N YC startups in a given sector ranked by TF-IDF similarity to your description.
+
+```bash
+curl -X POST http://localhost:8080/compete.v1.CompeteService/FindCompetitors \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "MyFintech",
+    "description": "fintech payments platform",
+    "sector": "fintech",
+    "limit": 3
+  }'
+```
+
+### GetMarketHeatmap
+
+Returns YC batch counts and per-batch trend (`growing` / `stable` / `shrinking`) for a sector, plus an overall market status and growth factor.
+
+```bash
+curl -X POST http://localhost:8080/compete.v1.CompeteService/GetMarketHeatmap \
+  -H "Content-Type: application/json" \
+  -d '{"sector": "fintech"}'
+```
+
+## Tests
+
+```bash
+go test ./...                        # all packages
+go test ./internal/handler/...       # handler integration tests
+```
+
+The handler tests stand up an in-process `httptest.Server` with a fake provider, so they run without hitting the YC API.
+
+## Regenerating proto code
+
+After editing `proto/compete/v1/compete.proto`:
+
+```bash
+buf generate
+```
