@@ -287,7 +287,7 @@ func (x *GetMarketHeatmapRequest) GetSector() string {
 
 type GetMarketHeatmapResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Batches       []*BatchTrend          `protobuf:"bytes,1,rep,name=batches,proto3" json:"batches,omitempty"`
+	BatchTrends   []*BatchTrend          `protobuf:"bytes,1,rep,name=batch_trends,json=batchTrends,proto3" json:"batch_trends,omitempty"`
 	MarketStatus  string                 `protobuf:"bytes,2,opt,name=market_status,json=marketStatus,proto3" json:"market_status,omitempty"`
 	GrowthFactor  float64                `protobuf:"fixed64,3,opt,name=growth_factor,json=growthFactor,proto3" json:"growth_factor,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -324,9 +324,9 @@ func (*GetMarketHeatmapResponse) Descriptor() ([]byte, []int) {
 	return file_compete_v1_compete_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetMarketHeatmapResponse) GetBatches() []*BatchTrend {
+func (x *GetMarketHeatmapResponse) GetBatchTrends() []*BatchTrend {
 	if x != nil {
-		return x.Batches
+		return x.BatchTrends
 	}
 	return nil
 }
@@ -433,9 +433,9 @@ const file_compete_v1_compete_proto_rawDesc = "" +
 	"\vmatch_score\x18\b \x01(\x01R\n" +
 	"matchScore\"1\n" +
 	"\x17GetMarketHeatmapRequest\x12\x16\n" +
-	"\x06sector\x18\x01 \x01(\tR\x06sector\"\x96\x01\n" +
-	"\x18GetMarketHeatmapResponse\x120\n" +
-	"\abatches\x18\x01 \x03(\v2\x16.compete.v1.BatchTrendR\abatches\x12#\n" +
+	"\x06sector\x18\x01 \x01(\tR\x06sector\"\x9f\x01\n" +
+	"\x18GetMarketHeatmapResponse\x129\n" +
+	"\fbatch_trends\x18\x01 \x03(\v2\x16.compete.v1.BatchTrendR\vbatchTrends\x12#\n" +
 	"\rmarket_status\x18\x02 \x01(\tR\fmarketStatus\x12#\n" +
 	"\rgrowth_factor\x18\x03 \x01(\x01R\fgrowthFactor\"]\n" +
 	"\n" +
@@ -473,7 +473,7 @@ var file_compete_v1_compete_proto_goTypes = []any{
 }
 var file_compete_v1_compete_proto_depIdxs = []int32{
 	2, // 0: compete.v1.FindCompetitorsResponse.competitors:type_name -> compete.v1.Competitor
-	5, // 1: compete.v1.GetMarketHeatmapResponse.batches:type_name -> compete.v1.BatchTrend
+	5, // 1: compete.v1.GetMarketHeatmapResponse.batch_trends:type_name -> compete.v1.BatchTrend
 	0, // 2: compete.v1.CompeteService.FindCompetitors:input_type -> compete.v1.FindCompetitorsRequest
 	3, // 3: compete.v1.CompeteService.GetMarketHeatmap:input_type -> compete.v1.GetMarketHeatmapRequest
 	1, // 4: compete.v1.CompeteService.FindCompetitors:output_type -> compete.v1.FindCompetitorsResponse

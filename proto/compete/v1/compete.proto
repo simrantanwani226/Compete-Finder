@@ -6,9 +6,9 @@ option go_package = "github.com/simrantanwani226/compete-finder/gen/compete/v1;c
 
 service CompeteService {
   rpc FindCompetitors(FindCompetitorsRequest) returns (FindCompetitorsResponse);
+
   rpc GetMarketHeatmap(GetMarketHeatmapRequest) returns (GetMarketHeatmapResponse);
 }
-
 message FindCompetitorsRequest {
   string name = 1;
   string description = 2;
@@ -31,13 +31,12 @@ message Competitor {
   string url = 7;
   double match_score = 8;
 }
-
 message GetMarketHeatmapRequest {
   string sector = 1;
 }
 
 message GetMarketHeatmapResponse {
-  repeated BatchTrend batches = 1;
+  repeated BatchTrend batch_trends = 1;
   string market_status = 2;
   double growth_factor = 3;
 }

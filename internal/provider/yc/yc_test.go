@@ -7,14 +7,58 @@ import (
 	"testing"
 )
 
-// WHY a fake HTTP server?
-// We don't want tests hitting the real YC API because:
-// 1. Tests would be slow (network call)
-// 2. Tests would be flaky (API could be down)
-// 3. Tests wouldn't be deterministic (data changes)
-//
-// httptest.NewServer creates a local HTTP server that returns our test data.
-// The provider doesn't know it's fake — it just sees a URL.
+func TestToStartup(t *testing.T) {
+	c := ycCompany{
+		Name:            "TestCo",
+		OneLiner:        "A test company",
+		LongDescription: "A longer description",
+		Industries:      []string{"Fintech", "B2B"},
+		Batch:           "W24",
+		TeamSize:        10,
+		Status:          "Active",
+		Website:         "https://testco.com",
+	}
+
+	s := c.toStartup()
+
+	if s.Name != "TestCo" {
+		t.Errorf("expected 'TestCo', got %q", s.Name)
+	}
+	// one_liner should be used as Description when present
+	if s.Description != "A test company" {
+		t.Errorf("expected 'A test company', got %q", s.Description)
+	}
+	if len(s.Industries) != 2 {
+		t.Errorf("expected 2 industries, got %d", len(s.Industries))
+	}
+	if s.Batch != "W24" {
+		t.Errorf("expected 'W24', got %q", s.Batch)
+	}
+	if s.TeamSize != 10 {
+		t.Errorf("expected 10, got %d", s.TeamSize)
+	}
+	if s.Status != "Active" {
+		t.Errorf("expected 'Active', got %q", s.Status)
+	}
+	if s.URL != "https://testco.com" {
+		t.Errorf("expected 'https://testco.com', got %q", s.URL)
+	}
+}
+
+func TestToStartupFallback(t *testing.T) {
+	c := ycCompany{
+		Name:            "NullCo",
+		OneLiner:        "",
+		LongDescription: "Only has long desc",
+	}
+
+	s := c.toStartup()
+
+	// When one_liner is empty, should fall back to long_description
+	if s.Description != "Only has long desc" {
+		t.Errorf("expected fallback to long_description, got %q", s.Description)
+	}
+}
 
 const testJSON = `[
 	{
@@ -39,15 +83,20 @@ const testJSON = `[
 	}
 ]`
 
+func TestName(t *testing.T) {
+	p := New("http://example.com")
+	if p.Name() != "yc" {
+		t.Errorf("expected 'yc', got %q", p.Name())
+	}
+}
+
 func TestFetch(t *testing.T) {
-	// Create fake HTTP server that returns our test JSON
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(testJSON))
 	}))
-	defer srv.Close() // Clean up after test
+	defer srv.Close()
 
-	// Create provider pointing at our fake server (not the real YC API)
 	p := New(srv.URL)
 	startups, err := p.Fetch(context.Background())
 	if err != nil {
@@ -57,26 +106,19 @@ func TestFetch(t *testing.T) {
 	if len(startups) != 2 {
 		t.Fatalf("expected 2 startups, got %d", len(startups))
 	}
-
-	// Verify field mapping works correctly
 	if startups[0].Name != "TestCo" {
-		t.Errorf("expected name TestCo, got %s", startups[0].Name)
+		t.Errorf("expected 'TestCo', got %q", startups[0].Name)
 	}
 	if startups[0].Description != "A test company" {
-		t.Errorf("expected one_liner as description, got %s", startups[0].Description)
+		t.Errorf("expected 'A test company', got %q", startups[0].Description)
 	}
-	if len(startups[0].Industries) != 2 {
-		t.Errorf("expected 2 industries, got %d", len(startups[0].Industries))
-	}
-
-	// KEY TEST: When one_liner is empty, fall back to long_description
+	// Fallback test
 	if startups[1].Description != "Only has long desc" {
-		t.Errorf("expected long_description fallback, got %s", startups[1].Description)
+		t.Errorf("expected fallback description, got %q", startups[1].Description)
 	}
 }
 
 func TestFetchServerError(t *testing.T) {
-	// Server that always returns 500
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
@@ -86,5 +128,18 @@ func TestFetchServerError(t *testing.T) {
 	_, err := p.Fetch(context.Background())
 	if err == nil {
 		t.Fatal("expected error on 500 response")
+	}
+}
+
+func TestFetchBadJSON(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`not valid json`))
+	}))
+	defer srv.Close()
+
+	p := New(srv.URL)
+	_, err := p.Fetch(context.Background())
+	if err == nil {
+		t.Fatal("expected error on bad JSON")
 	}
 }

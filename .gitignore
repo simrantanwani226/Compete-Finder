@@ -1,0 +1,9 @@
+# Learning infrastructure — never committed
+course/
+tools/
+progress.json
+.claude/
+
+# Build artifacts
+/server
+
